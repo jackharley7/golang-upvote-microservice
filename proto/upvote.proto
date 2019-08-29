@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package discussproto;
+
+import "google/api/annotations.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+option go_package = "discussproto";
+
+enum UpvoteType {
+  NONE = 0;
+  UP = 1;
+  DOWN = 2;
+}
+
+message Upvote {
+  string id = 1;
+  string itemId = 2;
+  string category = 3;
+  int64 userId = 4;
+  UpvoteType type = 5;
+}
+
+message UpvoteCheck {
+  string itemId = 1;
+  UpvoteType type = 2;
+}
+
+service UpvoteService {
+  rpc Upvote(UpvoteRequest) returns (UpvoteResponse) {
+    option (google.api.http) = {
+      post: "/api/upvote/cat/{category}/{itemId}/upvote"
+    };
+  }
+  rpc Downvote(DownvoteRequest) returns (DownvoteResponse) {
+    option (google.api.http) = {
+      post: "/api/upvote/cat/{category}/{itemId}/downvote"
+    };
+  }
+  rpc RemoveVote(RemoveVoteRequest) returns (RemoveVoteResponse) {
+    option (google.api.http) = {
+      delete: "/api/upvote/cat/{category}/{itemId}"
+    };
+  }
+  rpc CheckUserVotes(CheckUserVotesRequest) returns (CheckUserVotesResponse) {
+    option (google.api.http) = {
+      get: "/api/upvote/cat/{category}/check"
+    };
+  }
+}
+
+message UpvoteRequest {
+  string itemId = 1;
+  string category = 2;
+}
+message UpvoteResponse {
+  bool done = 1;
+}
+
+message DownvoteRequest {
+  string itemId = 1;
+  string category = 2;
+}
+message DownvoteResponse {
+  bool done = 1;
+}
+
+message RemoveVoteRequest {
+  string itemId = 1;
+  string category = 2;
+}
+message RemoveVoteResponse {
+  bool done = 1;
+}
+
+message CheckUserVotesRequest {
+  string category = 1;
+  string itemIds = 2;
+}
+message CheckUserVotesResponse {
+  string category = 1;
+  string itemIds = 2;
+  repeated UpvoteCheck votes = 3;
+}
